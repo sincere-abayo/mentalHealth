@@ -1,0 +1,115 @@
+{% extends "doctor/base.html" %}
+
+{% block title %}MENTAL HEALTH | DOCTOR DASHBOARD{% endblock %}
+
+{% block body %}
+{% include "doctor/doctor_navbar.html" %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+
+<script>
+
+  function generatePDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4'
+    });
+
+    doc.text("Patients Data Report", 10, 10);
+
+    const table = document.getElementById("example");
+    doc.autoTable({
+        html: '#example',
+        startY: 15,
+        margin: { left: 10 },
+        columns: [
+            {header: 'Patient ID', dataKey: 'patientId'},
+            {header: 'Patient Name', dataKey: 'patientName'},
+            {header: 'Patient Email', dataKey: 'patientEmail'},
+            {header: 'Patient Gender', dataKey: 'patientGender'},
+            {header: 'Patient DoB', dataKey: 'patientDoB'},
+            {header: 'Patient Contact', dataKey: 'patientContact'},
+            {header: 'Contact Prefer', dataKey: 'patientContactPrefer'},
+        ],
+        columnStyles: {
+            0: {cellWidth: 25},
+            1: {cellWidth: 40},
+            2: {cellWidth: 50},
+            3: {cellWidth: 25},
+            4: {cellWidth: 30},
+            5: {cellWidth: 35},
+            6: {cellWidth: 35},
+        },
+        body: Array.from(table.querySelectorAll('tbody tr')).map(row => {
+            return Array.from(row.querySelectorAll('td')).slice(0, 7).map(cell => cell.textContent);
+        })
+    });
+
+    doc.save("patients_report.pdf");
+}
+
+  
+
+</script>
+<main class="mt-5 pt-3">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <h4>COMFIRMED PATIENTS PAGE</h4>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12 mb-3">
+        <div class="card">
+          <div class="card-header">
+            <span><i class="bi bi-table me-2"> Patients Data Table</i></span> 
+              <button class="btn btn-success" onclick="generatePDF()">Generate Report</button>
+            </a>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table id="example" class="table table-striped data-table" style="width: 100%">
+                <thead>
+                  <tr>
+                    <th>Patient ID</th>
+                    <th>Patient Name</th>
+                    <th>Patient Email</th>
+                    <th>Patient Gender</th>
+                    <th>Patient DoB</th>
+                    <th>Patient Contact</th>
+                    <th>contact prefer</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for patient in patients %}
+                  <tr>
+                    <td>{{ patient.patient_id }}</td>
+                    <td>{{ patient.firstname }} {{ patient.lastname }}</td>
+                    <td>{{ patient.email }}</td>
+                    <td>{{ patient.gender }}</td>
+                    <td>{{ patient.DOB }}</td>
+                    <td>{{ patient.contact }}</td>
+                    <td>{{ patient.contact_prefer }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>  
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.0.2/dist/chart.min.js"></script>
+<script src="{{ url_for('static', filename='js/jquery-3.5.1.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery.dataTables.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dataTables.bootstrap5.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+{% endblock %}

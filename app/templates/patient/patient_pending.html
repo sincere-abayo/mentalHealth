@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+{% extends "patient/pbase.html" %} {% block title %}Patient Dashboard{% endblock
+%} {% block body %} {% include "patient/pnavbar.html" %}
+
+<main class="mt-5 pt-3">
+ 
+
+  <div class="card mb-4">
+      <div class="card-header text-center">
+        <h4>
+          <i class="bi bi-clipboard-pulse me-2"></i> Patient Portal
+        </h4>
+      </div>
+    <div class="card-body">
+      <div class="alert alert-info" role="alert">
+        <h5 class="alert-heading"><i class="bi bi-hourglass-split me-2"></i>Waiting List Status</h5>
+        <p>You are currently on the waiting list for a therapist in the <strong>{{ position.position_name }}</strong> department.</p>
+        <p>Your appointment has been automatically assigned based on the answers you provided in the questionnaire.</p>
+        <p>We will notify you as soon as a therapist is available to treat you. Thank you for your patience.</p>
+      </div>
+    </div>
+  </div>
+
+      <div class="card-body">
+        {% if questionnaire %}
+        <div class="questionnaire">
+          <h5 class="mb-3">
+            Questionnaire submitted on {{
+            questionnaire.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+          </h5>
+          <table class="table table-striped">
+            <tbody>
+              <tr>
+                <td>Have You Ever Felt Suicidal</td>
+                <td>
+                  <span
+                    class="badge {% if questionnaire.qn1 == '1' %}bg-danger{% else %}bg-success{% endif %}"
+                    >{{ 'Yes' if questionnaire.qn1 == '1' else 'No' }}</span
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>Have You Lost interest in things you used to like</td>
+                <td>
+                  <span
+                    class="badge {% if questionnaire.qn2 == '1' %}bg-danger{% else %}bg-success{% endif %}"
+                    >{{ 'Yes' if questionnaire.qn2 == '1' else 'No' }}</span
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>Have You Ever felt hopeless about your future</td>
+                <td>
+                  <span
+                    class="badge {% if questionnaire.qn3 == '1' %}bg-danger{% else %}bg-success{% endif %}"
+                    >{{ 'Yes' if questionnaire.qn3 == '1' else 'No' }}</span
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>Have You Ever found it difficult to make decisions</td>
+                <td>
+                  <span
+                    class="badge {% if questionnaire.qn4 == '1' %}bg-danger{% else %}bg-success{% endif %}"
+                    >{{ 'Yes' if questionnaire.qn4 == '1' else 'No' }}</span
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>Have You Ever taken drugs</td>
+                <td>
+                  <span
+                    class="badge {% if questionnaire.qn5 == '1' %}bg-danger{% else %}bg-success{% endif %}"
+                    >{{ 'Yes' if questionnaire.qn5 == '1' else 'No' }}</span
+                  >
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card mb-4">
+          <div class="card-header bg-danger text-white">
+            <h4>
+              <i class="bi bi-exclamation-triangle-fill me-2"></i> Emergency Help
+            </h4>
+          </div>
+          <div class="card-body">
+            <p>If you are experiencing a mental health emergency or crisis, please contact:</p>
+            <ul>
+              <li><strong>Emergency Services contact:</strong> +250 781 637 795</li>
+              <li><strong>Emergency Services email:</strong> 
+                             <a href="mailto:josiane@gmail.com" target="_blank">
+                                 <i class="fas fa-envelope"></i> josiane@gmail.com
+                             </a>
+            </ul>
+            <p>These services are available 24/7 and provide immediate support.</p>
+          </div>
+        </div>
+    
+        {% else %}
+        <p class="text-muted">You haven't submitted any questionnaires yet.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</main>
+<script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.0.2/dist/chart.min.js"></script>
+<script src="{{ url_for('static', filename='js/jquery-3.5.1.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery.dataTables.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dataTables.bootstrap5.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+{% endblock %}

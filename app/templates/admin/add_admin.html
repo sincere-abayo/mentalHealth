@@ -1,0 +1,69 @@
+{% extends "admin/base.html" %}
+
+{% block title %}MENTAL HEALTH | ADD ADMIN{% endblock %}
+
+{% block body %}
+{% include "admin/navbar.html" %}
+
+<main class="mt-5 pt-3">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <h4>NEW ADMIN PAGE</h4>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12 mb-3">
+        <div class="card">
+          <div class="card-header">
+            <span><i class="bi bi-person me-2"></i>NEW ADMIN</span> 
+          </div>
+          <div class="card-body">
+            <form class="form-horizontal" action="{{ url_for('add_admin') }}" method="POST">
+              <div class="form-group">
+                <label class="control-label col-lg-2 mb-2" for="fullname">ADMIN FULLNAME</label>
+                <div class="col-lg-8">
+                  <input type="text" class="form-control mb-2" id="fullname" name="fullname" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="control-label col-lg-2 mb-2" for="phone">ADMIN CONTACT</label>
+                <div class="col-lg-8">
+                  <input type="text" class="form-control mb-2" id="phone" name="phone" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="control-label col-lg-2 mb-2" for="email">ADMIN EMAIL</label>
+                <div class="col-lg-8">
+                  <input type="email" class="form-control mb-2" id="email" name="email" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="control-label col-lg-2 mb-2" for="pswd">ADMIN PASSWORD</label>
+                <div class="col-lg-8">
+                  <input type="password" class="form-control mb-2" id="pswd" name="pswd" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="col-lg-offset-2 col-lg-9">
+                  <button type="submit" class="btn btn-primary">Add</button>
+                  <button type="reset" class="btn btn-danger">Reset</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.0.2/dist/chart.min.js"></script>
+<script src="{{ url_for('static', filename='js/jquery-3.5.1.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery.dataTables.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dataTables.bootstrap5.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+{% endblock %}

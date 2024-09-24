@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+{% extends "admin/base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block body %}
+{% include "admin/navbar.html" %}
+
+
+    <main class="mt-5 pt-3">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12">
+            <h4>Dashboard</h4>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <div class="card bg-primary text-white h-100">
+              <a href="{{ url_for('doctors') }}" style="text-decoration:none;color:white">
+                <div class="card-body py-5">Doctors<p>{{ doctor_count }}</p></div>
+                <div class="card-footer d-flex">
+                  View Details
+                  <span class="ms-auto">
+                    <i class="bi bi-chevron-right"></i>
+                  </span>
+                </div>
+              </a>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="card bg-danger text-dark h-100">
+              <a href="{{ url_for('inactive_patients') }}" style="text-decoration:none;color:white">
+                <div class="card-body py-5">inactive patients<p>{{ inactive_patient_count }}</p></div>
+                <div class="card-footer d-flex">
+                  View Details
+                  <span class="ms-auto">
+                    <i class="bi bi-chevron-right"></i>
+                  </span>
+                </div>
+              </a>
+            </div>
+          </div> 
+          <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-dark h-100">
+              <a href="{{ url_for('pending_patients') }}" style="text-decoration:none;color:white">
+                <div class="card-body py-5">Pending patients<p>{{ pending_patient_count }}</p></div>
+                <div class="card-footer d-flex">
+                  View Details
+                  <span class="ms-auto">
+                    <i class="bi bi-chevron-right"></i>
+                  </span>
+                </div>
+              </a>
+            </div>
+          </div>
+
+                    
+          <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white h-100">
+              <a href="{{ url_for('taken_patients') }}" style="text-decoration:none;color:white">
+                <div class="card-body py-5">Taken patients<p>{{ taken_patient_count }}</p></div>
+                <div class="card-footer d-flex">
+                  View Details
+                  <span class="ms-auto">
+                    <i class="bi bi-chevron-right"></i>
+                  </span>
+                </div>
+              </a>
+            </div>
+          </div> 
+
+           
+        </div>
+        
+        <div class="row">
+          <div class="col-md-12 mb-3">
+            <div class="card">
+              <div class="card-header">
+                <span><i class="bi bi-table me-2"> Patient Data ({{patients_count}})</i></span> 
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table id="example" class="table table-striped data-table" style="width: 100%;min-width: 1200px;">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Gender</th>
+                        <th>DoB</th>
+                        <th>Contact</th>
+                        <th>contact_prefer</th>
+                        <th>Status</th>
+                        <th>Doctor Position</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for patient in patients %}
+                      <tr>
+                        <td>{{ patient.patient_id }}</td>
+                        <td>{{ patient.firstname }} {{ patient.lastname }}</td>
+                        <td>{{ patient.email }}</td>
+                        <td>{{ patient.gender }}</td>
+                        <td>{{ patient.dob }}</td>
+                        <td>{{ patient.contact }}</td>
+                        <td>{{ patient.contact_prefer }}</td>
+                        <td>{{ patient.status }}</td>
+                        <td>{{ patient.position.position_name if patient.position else 'N/A' }}</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>                  
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.0.2/dist/chart.min.js"></script>
+    <script src="{{ url_for('static', filename='js/jquery-3.5.1.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dataTables.bootstrap5.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+ 
+    {% endblock %}

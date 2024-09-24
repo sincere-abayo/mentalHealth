@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Success</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background: url("{{ url_for('static', filename='image/s3.jpg') }}");
+
+      }
+      .container {
+        text-align: center;
+        background-color: rgba(0, 0, 0, 0.5);
+        padding: 2rem;
+        color: #fff;
+        border-radius: 10px;
+        box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.3);
+      }
+      .alert {
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 5px;
+      }
+      .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+      }
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+      }
+      .btn:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Success! </h1>
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for category, message in messages %} {% if category ==
+      'successfull' %}
+
+      <div class="alert alert-{{ category }}"> Information successfully recorded. After payment you will be contacted soon by our Therapist doctor in
+        <br>  <b>{{ message }}</b></div>
+      {% endif %} {% endfor %} {% endif %} {% endwith %}
+      <form
+        action="https://afripay.africa/checkout/index.php"
+        method="post"
+        id="afripayform"
+      >
+        <input type="hidden" name="amount" value="500" />
+
+        <input type="hidden" name="currency" value="RWF" />
+
+        <input type="hidden" name="comment" value="Order 122" />
+
+        <input type="hidden" name="client_token" value="" />
+
+        <input
+          type="hidden"
+          name="return_url"
+          value="http://127.0.0.1:5000/payment_pending"
+        />
+
+        <input type="hidden" name="firstname" value="" />
+
+        <input type="hidden" name="lastname" value="" />
+
+        <input type="hidden" name="street" value="" />
+
+        <input type="hidden" name="city" value="" />
+
+        <input type="hidden" name="state" value="" />
+
+        <input type="hidden" name="zip_code" value="" />
+
+        <input type="hidden" name="country" value="" />
+
+        <input type="hidden" name="email" value="" />
+
+        <input type="hidden" name="phone" value="" />
+
+        <input
+          type="hidden"
+          name="app_id"
+          value="143b342a2c1359ce58579e53c51cee5c"
+        />
+
+        <input type="hidden" name="app_secret" value="JDJ5JDEwJEVDenJO" />
+
+        <input
+          type="submit"
+          name="submit"
+          value="Pay with AfriPay"
+          onclick="document.afripayform.submit();"
+          class="btn"
+        />
+      </form>
+      
+  </body>
+</html>

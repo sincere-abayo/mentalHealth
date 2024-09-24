@@ -1,0 +1,83 @@
+{% extends "doctor/base.html" %}
+
+{% block title %}MENTAL HEALTH | DOCTOR DASHBOARD{% endblock %}
+
+{% block body %}
+{% include "doctor/doctor_navbar.html" %}
+
+<main class="mt-5 pt-3">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <h4>DOCTOR DASHBOARD - PENDING PATIENTS</h4>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Welcome, Dr. {{ doctor.fullname }}</h5>
+            <p class="card-text">Position: {{ doctor.position.position_name }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="row">
+      <div class="col-md-12 mb-3">
+        <div class="card">
+          <div class="card-header">
+            <span><i class="bi bi-table me-2"> Pending Patients Data Table</i></span> 
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table id="example" class="table table-striped data-table" style="width: 100%">
+                <thead>
+                  <tr>
+                    <th>Patient ID</th>
+                    <th>Patient Name</th>
+                    <th>Patient Email</th>
+                    <th>Patient Gender</th>
+                    <th>Patient DoB</th>
+                    <th>Patient Contact</th>
+                    <th>Patient contact_prefer</th>
+                    <th>Patient Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for patient in patients %}
+                  <tr>
+                    <td>{{ patient.patient_id }}</td>
+                    <td>{{ patient.firstname }} {{ patient.lastname }}</td>
+                    <td>{{ patient.email }}</td>
+                    <td>{{ patient.gender }}</td>
+                    <td>{{ patient.DOB }}</td>
+                    <td>{{ patient.contact }}</td>
+                    <td>{{ patient.contact_prefer }}</td>
+                    <td>{{ patient.status }}</td>
+                    <td>
+                      <a href="{{ url_for('take_patient', patient_id=patient.patient_id) }}" class="btn btn-primary btn-sm">take</a>
+                      <!-- <a href="{{ url_for('confirm_patient', patient_id=patient.patient_id) }}" class="btn btn-primary btn-sm">confirm</a> -->
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>  
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.0.2/dist/chart.min.js"></script>
+<script src="{{ url_for('static', filename='js/jquery-3.5.1.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery.dataTables.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dataTables.bootstrap5.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+{% endblock %}

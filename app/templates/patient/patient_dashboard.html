@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+{% extends "patient/base.html" %} {% block title %}Patient Dashboard{% endblock
+%} {% block body %} {% include "patient/navbar.html" %}
+
+<main class="mt-5 pt-3">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <h4>Patient portal</h4>
+        <label for="success0message" id="success"></label>
+      </div>
+      <!-- display patient progress here -->
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-header">
+              <h5>My Recurvery Progress</h5>
+            </div>
+            <div class="card-body">
+              <div class="progress mb-3">
+                <div id="progress-bar" class="progress-bar" role="progressbar" style="width: {{ patient.progress }}%;" aria-valuenow="{{ patient.progress }}" aria-valuemin="0" aria-valuemax="100">{{ patient.progress }}%</div>
+              </div>
+              <p class="text-muted">Your current progress as assessed by your therapist.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <!-- therapist detail -->
+      <div class="col-md-4 mb-2">
+        <div class="card bg-light text-black h-70">
+          <div
+            class="card-header d-flex justify-content-between align-items-center"
+          >
+            <h5 class="mb-0">
+              <i class="bi bi-person-badge me-2"></i>My Therapist
+            </h5>
+
+            <!-- Button to send message -->
+            <button
+              type="button"
+              class="btn btn-secondary btn-sm"
+              style="width: 80px"
+              data-bs-toggle="modal"
+              data-bs-target="#sendMessageModal"
+            >
+              <i class="bi bi-envelope me-2"></i> Send Message
+            </button>
+          </div>
+
+          <div class="card-body">
+            <h6 class="card-title">{{doctor.fullname}}</h6>
+            <p class="card-text">
+              <i class="bi bi-envelope me-2"></i>{{doctor.email}}
+            </p>
+            <p class="card-text">
+              <i class="bi bi-telephone me-2"></i>{{doctor.contact}}
+            </p>
+            <p class="card-text">
+              <i class="bi bi-gender-ambiguous me-2"></i>{{doctor.gender}}
+            </p>
+            <p class="card-text">
+              <i class="bi bi-briefcase me-2"></i>{{position.position_name}}
+            </p>
+          </div>
+        
+        </div>
+      </div>
+      <!-- message block -->
+      <div class="col-md-8 mb-4">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-chat-dots me-2"></i>Messages</h5>
+          </div>
+          <div
+            class="card-body"
+            style="height: 400px; overflow-y: auto"
+            id="message-container"
+          >
+            <div id="message-list">
+              <!-- Messages will be dynamically loaded here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- send message form modal -->
+    <div
+      class="modal fade"
+      id="sendMessageModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="sendMessageModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="sendMessageModalLabel">Send Message</h5>
+            <button
+              type="button"
+              class="close-modal"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <form id="send-message-form">
+            <div class="modal-body">
+              <div class="form-group">
+                <h6 class="card-title">{{doctor.fullname}}</h6>
+                <p class="card-text">
+                  <i class="bi bi-envelope me-2"></i>{{doctor.email}}
+                </p>
+                <input
+                  type="hidden"
+                  name="receiver-id"
+                  value="{{doctor.doctor_id}}"
+                />
+                <input
+                  type="hidden"
+                  name="sender-id"
+                  value="{{patient.patient_id}}"
+                />
+                <input type="hidden" name="sender-type" value="patient" />
+                <input type="hidden" name="receiver-type" value="doctor" />
+              </div>
+              <div class="form-group">
+                <label for="message-content">Message</label>
+                <textarea
+                  class="form-control"
+                  name="message-content"
+                  rows="3"
+                  required
+                ></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="reset"
+                class="btn btn-secondary"
+                data-dismiss="modal"
+              >
+                reset
+              </button>
+              <button
+                type="submit  "
+                class="btn btn-primary"
+                id="send-message-btn"
+              >
+                Send Message
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h4>
+          <i class="bi bi-clipboard-pulse me-2"></i> My Mental Health Status
+        </h4>
+      </div>
+      <div class="card-body">
+        {% if questionnaire %}
+        <div class="questionnaire">
+          <h5 class="mb-3">
+            Questionnaire submitted on {{
+            questionnaire.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+          </h5>
+          <table class="table table-striped">
+            <tbody>
+              <tr>
+                <td>Have You Ever Felt Suicidal</td>
+                <td>
+                  <span
+                    class="badge {% if questionnaire.qn1 == '1' %}bg-danger{% else %}bg-success{% endif %}"
+                    >{{ 'Yes' if questionnaire.qn1 == '1' else 'No' }}</span
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>Have You Lost interest in things you used to like</td>
+                <td>
+                  <span
+                    class="badge {% if questionnaire.qn2 == '1' %}bg-danger{% else %}bg-success{% endif %}"
+                    >{{ 'Yes' if questionnaire.qn2 == '1' else 'No' }}</span
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>Have You Ever felt hopeless about your future</td>
+                <td>
+                  <span
+                    class="badge {% if questionnaire.qn3 == '1' %}bg-danger{% else %}bg-success{% endif %}"
+                    >{{ 'Yes' if questionnaire.qn3 == '1' else 'No' }}</span
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>Have You Ever found it difficult to make decisions</td>
+                <td>
+                  <span
+                    class="badge {% if questionnaire.qn4 == '1' %}bg-danger{% else %}bg-success{% endif %}"
+                    >{{ 'Yes' if questionnaire.qn4 == '1' else 'No' }}</span
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>Have You Ever taken drugs</td>
+                <td>
+                  <span
+                    class="badge {% if questionnaire.qn5 == '1' %}bg-danger{% else %}bg-success{% endif %}"
+                    >{{ 'Yes' if questionnaire.qn5 == '1' else 'No' }}</span
+                  >
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="text-muted">You haven't submitted any questionnaires yet.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+  function fetchMessages() {
+    fetch(`/get_messages/patient/{{patient.patient_id}}`)
+      .then((response) => response.json())
+      .then((messages) => {
+        const messageList = document.getElementById("message-list");
+        messageList.innerHTML = messages
+          .map(
+            (msg) => `
+        <div class="message mb-2 ${
+          msg.sender_type === "patient" ? "text-end" : "text-start"
+        }">
+          <div class="d-inline-block p-2 rounded ${
+            msg.sender_type === "patient" ? "bg text-black" : "bg-light"
+          }">
+            <strong>${
+              msg.sender_type === "patient" ? "You" : "Doctor"
+            }:</strong>
+            <p class="mb-0">${msg.content}</p>
+            <small class="text-muted">${new Date(
+              msg.timestamp
+            ).toLocaleString()}</small>
+          </div>
+        </div>
+      `
+          )
+          .join("");
+        const messageContainer = document.getElementById("message-container");
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+      });
+  }
+
+  // Fetch messages on page load
+  fetchMessages();
+
+  // Refresh messages every 30 seconds
+  setInterval(fetchMessages, 30000);
+
+  // close message modal
+  document.querySelector(".close-modal").addEventListener("click", hideModal);
+  function hideModal() {
+    $("#sendMessageModal").modal("hide");
+  }
+  // Send message
+  document
+    .getElementById("send-message-form")
+    .addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      const formData = new FormData(this);
+
+      // Manually create a JSON object from the form data
+      const data = {
+        sender_id: formData.get("sender-id"),
+        receiver_id: formData.get("receiver-id"),
+        sender_type: formData.get("sender-type"),
+        receiver_type: formData.get("receiver-type"),
+        content: formData.get("message-content"),
+      };
+
+      fetch("/send_message", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data), // Convert the object into a JSON string
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.message) {
+            console.log(data.message);
+            // Display a success message or perform any other action
+            document
+              .getElementById("success")
+              .classList.add("btn", "btn-success");
+            document.getElementById("success").innerHTML =
+              "message sent well to your therapiste";
+            //reload after 2sec
+            setTimeout(function () {
+              window.location.reload();
+            }, 2000);
+            // Optionally, hide the modal or reset the form
+            $("#sendMessageModal").modal("hide");
+          } else if (data.error) {
+            console.error(data.error);
+          }
+        })
+        .catch((error) => console.error("Error:", error));
+    });
+
+
+  fetchPendingSurveys();
+  setInterval(fetchPendingSurveys, 30000); // Refresh every minute
+</script>
+<script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.0.2/dist/chart.min.js"></script>
+<script src="{{ url_for('static', filename='js/jquery-3.5.1.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery.dataTables.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dataTables.bootstrap5.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+{% endblock %}
+
+<!-- Add this section to the patient dashboard -->

@@ -1,0 +1,594 @@
+{% extends "doctor/base.html" %} {% block title %}MENTAL HEALTH | DOCTOR
+DASHBOARD{% endblock %} {% block body %} {% include "doctor/doctor_navbar.html"
+%}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Include Font Awesome for Icons -->
+
+
+<script>
+  patientId = "{{patient_id}}";
+  // console.log(patientId)
+  fetchPatientProgress(patientId);
+  document.addEventListener("DOMContentLoaded", function () {
+    const patientId = `{{patient_id}}`;
+    fetchQuestionnaire(patientId);
+  });
+
+  // fetchQuestionnaire
+  function fetchQuestionnaire(patientId) {
+    fetch(`/get_patient_questionnaire/${patientId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        const questionnaireSection = document.getElementById(
+          "questionnaireSection"
+        );
+        if (data.questionnaire) {
+          questionnaireSection.innerHTML = `
+          <div class="card-body">
+            <div class="questionnaire">
+              <h5 class="mb-3">Questionnaire submitted on ${
+                data.questionnaire.created_at
+              }</h5>
+              <table class="table table-striped">
+                <tbody>
+                  ${generateQuestionRow(
+                    "Have You Ever Felt Suicidal",
+                    data.questionnaire.qn1
+                  )}
+                  ${generateQuestionRow(
+                    "Have You Lost interest in things you used to like",
+                    data.questionnaire.qn2
+                  )}
+                  ${generateQuestionRow(
+                    "Have You Ever felt hopeless about your future",
+                    data.questionnaire.qn3
+                  )}
+                  ${generateQuestionRow(
+                    "Have You Ever found it difficult to make decisions",
+                    data.questionnaire.qn4
+                  )}
+                  ${generateQuestionRow(
+                    "Have You Ever taken drugs",
+                    data.questionnaire.qn5
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+        } else {
+          questionnaireSection.innerHTML =
+            '<p class="text-muted">This patient hasn\'t submitted any questionnaires yet.</p>';
+        }
+      });
+  }
+
+  // generateQuestionRow
+  function generateQuestionRow(question, answer) {
+    return `
+    <tr>
+      <td>${question}</td>
+      <td>
+        <span class="badge ${answer === "1" ? "bg-danger" : "bg-success"}">
+          ${answer === "1" ? "Yes" : "No"}
+        </span>
+      </td>
+    </tr>
+  `;
+  }
+
+
+  // fetchPatientProgress
+  function fetchPatientProgress(patientId) {
+    fetch(`/get_progress/${patientId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        const labels = data.map((log) =>
+          new Date(log.timestamp).toLocaleDateString()
+        );
+        const moodData = data.map((log) => log.mood);
+
+        const ctx = document
+          .getElementById("patientProgressChart")
+          .getContext("2d");
+        new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Mood",
+                data: moodData,
+                borderColor: "rgb(75, 192, 192)",
+                tension: 0.1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 10,
+              },
+            },
+          },
+        });
+      });
+  }
+
+
+  // log progess js
+  document.addEventListener('DOMContentLoaded', function() {
+  const dateToggles = document.querySelectorAll('.date-toggle');
+  dateToggles.forEach(toggle => {
+    toggle.addEventListener('click', function() {
+      const targetId = this.getAttribute('data-target');
+      const targetElement = document.getElementById(targetId);
+      if (targetElement.style.display === 'none') {
+        targetElement.style.display = 'block';
+        this.querySelector('.bi-chevron-down').classList.replace('bi-chevron-down', 'bi-chevron-up');
+      } else {
+        targetElement.style.display = 'none';
+        this.querySelector('.bi-chevron-up').classList.replace('bi-chevron-up', 'bi-chevron-down');
+      }
+    });
+  });
+});
+</script>
+
+<main class="mt-5 pt-3">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <h4>PATIENTS TREATMENT PAGE</h4>
+
+
+
+
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              {% if category == 'taken' %}
+                <div class="alert alert-success" role="alert">{{ message }}</div>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12 mb-3">
+        <div class="card">
+         
+          <!-- Add patient name and email block -->
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <div class="card">
+                <div class="card-body">
+                  <div class="patient-info mb-1">
+                    <h5>
+                      <i class="bi bi-person-fill me-2"></i>Patient Information
+                    </h5>
+                    <p>
+
+
+                      <strong>Name:</strong> {{ patient.firstname }} {{ patient.lastname }}
+                    </p>
+                    <p><strong>Email:</strong> {{ patient.email }}</p>
+                    <p><strong>Phone:</strong> {{ patient.contact }}</p>
+                    <button
+                      type="button"
+                      class="btn btn-secondary btn-sm"
+                      data-bs-toggle="modal"
+                      data-bs-target="#sendMessageModal"
+                    >
+                      <i class="bi bi-envelope me-2"></i> Send Message
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-8 mb-3">
+              <div class="card">
+                <div class="card-header">
+                  <h5 class="mb-0">
+                    <i class="bi bi-chat-dots me-2"></i>Messages
+                  </h5>
+                </div>
+                <div class="card-body" style="height: 400px; overflow-y: auto">
+                  <div id="message-list"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Add the questionnaire section here -->
+          <div id="questionnaireSection" class="card-body">
+            <!-- Questionnaire content will be loaded here dynamically -->
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- Add the progress chart section here -->
+          <div class="col-md-8 mb-3">
+            <div class="card shadow-sm">
+              <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Patient Progress</h5>
+              </div>
+              <div class="card-body">
+                <!-- Score Explanation Section -->
+                <div class="mb-4">
+
+                  <h6 class="mb-3">Mood Meaning</h6>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <ul class="list-unstyled">
+                        <li class="mb-2">
+
+
+
+                          <i class="bi bi-arrow-up-circle-fill text-success me-2"></i>
+                          <strong>10:</strong> Outstanding
+                        </li>
+                        <li class="mb-2">
+
+
+
+                          <i class="bi bi-arrow-up-circle-fill text-success me-2"></i>
+                          <strong>9:</strong> Excellent
+                        </li>
+                        <li class="mb-2">
+
+
+
+                          <i class="bi bi-arrow-up-circle-fill text-success me-2"></i>
+                          <strong>8:</strong> Very good
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="col-md-4">
+                      <ul class="list-unstyled">
+                        <li class="mb-2">
+
+
+
+                          <i class="bi bi-arrow-right-circle-fill text-info me-2"></i>
+                          <strong>7:</strong> Good
+                        </li>
+                        <li class="mb-2">
+
+
+
+                          <i class="bi bi-arrow-right-circle-fill text-info me-2"></i>
+                          <strong>6:</strong> Slightly better
+                        </li>
+                        <li class="mb-2">
+
+
+
+                          <i class="bi bi-arrow-right-circle-fill text-info me-2"></i>
+                          <strong>5:</strong> Neutral
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="col-md-4">
+                      <ul class="list-unstyled">
+                        <li class="mb-2">
+
+
+
+                          <i class="bi bi-arrow-down-circle-fill text-danger me-2"></i>
+                          <strong>4:</strong> Less difficult
+                        </li>
+                        <li class="mb-2">
+
+
+
+                          <i class="bi bi-arrow-down-circle-fill text-danger me-2"></i>
+                          <strong>3:</strong> Difficult
+                        </li>
+                        <li class="mb-2">
+
+
+
+                          <i class="bi bi-arrow-down-circle-fill text-danger me-2"></i>
+                          <strong>2:</strong> Struggling
+                        </li>
+                        <li class="mb-2">
+
+
+
+                          <i class="bi bi-arrow-down-circle-fill text-danger me-2"></i>
+                          <strong>1:</strong> Very difficult
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Progress Chart -->
+                <div class="text-center mb-4">
+                  <h6>Patient's Current Progress</h6>
+                  <canvas id="patientProgressChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Add the mood section here -->
+          <div class="col-md-4 mb-3">
+            <div class="card">
+              <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Patient log progress</h5>
+              </div>
+              <div class="card-body">
+                {% if progressLogs %}
+                  {% for progressLog in progressLogs %}
+                    <div class="mb-3">
+                      <h6 class="mb-2 text-primary date-toggle" data-target="log-{{ loop.index }}">
+                        <i class="bi bi-calendar-event me-2"></i>
+                        {{ progressLog.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+                        <i class="bi bi-chevron-down float-end"></i>
+                      </h6>
+                      <div id="log-{{ loop.index }}" class="log-details p-3 border rounded shadow-sm" style="display: none;">
+                        <div class="mb-3">
+                          <h6 class="text-muted"><strong>Mood:</strong></h6>
+                          <p>{{ progressLog.mood }}</p>
+                        </div>
+                        <div class="mb-3">
+                          <h6 class="text-muted"><strong>Symptom:</strong></h6>
+                          <p>{{ progressLog.symptoms }}</p>
+                        </div>
+                        <div class="mb-3">
+                          <h6 class="text-muted"><strong>Notes:</strong></h6>
+                          <p>{{ progressLog.notes }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  {% endfor %}
+                {% else %}
+                  <div class="alert alert-info" role="alert">
+                    <i class="bi bi-info-circle me-2"></i>
+                    No progress logs available for this patient.
+                  </div>
+                {% endif %}
+              </div>
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card mt-4">
+      <div class="card-header">
+        <h5>Patient Progress </h5>
+        <label for="success" id="success"></label>
+      </div>
+      <div class="card-body">
+        <div class="progress mb-3">
+          <div id="progress-bar" class="progress-bar" role="progressbar" style="width: {{ patient.progress }}%;" aria-valuenow="{{ patient.progress }}" aria-valuemin="0" aria-valuemax="100">{{ patient.progress }}%</div>
+        </div>
+        <form id="update-progress-form">
+          <div class="input-group mb-3">
+            <input type="number" id="progress-input" class="form-control" min="0" max="100" value="{{ patient.progress }}" required>
+            <div class="input-group-append">
+              <span class="input-group-text">%</span>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Update Progress</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  </div>
+  <!-- send message form modal -->
+  <div
+    class="modal fade"
+    id="sendMessageModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="sendMessageModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="sendMessageModalLabel">Send Message</h5>
+          <button
+            type="button"
+            class="close-modal"
+            data-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form id="send-message-form">
+          <div class="modal-body">
+            <div class="form-group">
+              <h6 class="card-title">{{patient.firstname}}</h6>
+              <p class="card-text">
+                <i class="bi bi-envelope me-2"></i>{{patient.email}}
+              </p>
+              <input
+                type="hidden"
+                name="receiver-id"
+                value="{{patient.patient_id}}"
+              />
+              <input type="hidden" name="sender-id" value="{{doctor_id}}" />
+              <input type="hidden" name="sender-type" value="doctor" />
+              <input type="hidden" name="receiver-type" value="patient" />
+            </div>
+            <div class="form-group">
+              <label for="message-content">Message</label>
+              <textarea
+                class="form-control"
+                name="message-content"
+                rows="3"
+                required
+              ></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="reset" class="btn btn-secondary" data-dismiss="modal">
+              reset
+            </button>
+            <button
+              type="submit  "
+              class="btn btn-primary"
+              id="send-message-btn"
+            >
+              Send Message
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+  // get message from endpoint
+  function fetchMessages() {
+    fetch(
+      `/get_messages/doctor/{{doctor.doctor_id}}/patient/{{patient.patient_id}}`
+    )
+      .then((response) => response.json())
+      .then((messages) => {
+        const messageList = document.getElementById("message-list");
+        messageList.innerHTML = messages
+          .map(
+            (msg) => `
+        <div class="message mb-2 ${
+          msg.sender_type === "doctor" ? "text-end" : "text-start"
+        }">
+          <div class="d-inline-block p-2 rounded ${
+            msg.sender_type === "doctor" ? " text-black" : "bg-light"
+          }">
+            <strong>${
+              msg.sender_type === "doctor" ? "You" : "Patient"
+            }:</strong>
+            <p class="mb-0">${msg.content}</p>
+            <small class="text-muted">${new Date(
+              msg.timestamp
+            ).toLocaleString()}</small>
+          </div>
+        </div>
+      `
+          )
+          .join("");
+        const messageContainer = document.querySelector(".card-body");
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+      });
+  }
+
+  fetchMessages();
+  setInterval(fetchMessages, 30000);
+
+  // close modal
+  document.querySelector(".close-modal").addEventListener("click", hideModal);
+  function hideModal() {
+    $("#sendMessageModal").modal("hide");
+  }
+  // send message form
+  document
+    .getElementById("send-message-form")
+    .addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      const formData = new FormData(this);
+
+      // Manually create a JSON object from the form data
+      const data = {
+        sender_id: formData.get("sender-id"),
+        receiver_id: formData.get("receiver-id"),
+        sender_type: formData.get("sender-type"),
+        receiver_type: formData.get("receiver-type"),
+        content: formData.get("message-content"),
+      };
+
+      fetch("/send_message", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data), // Convert the object into a JSON string
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.message) {
+            console.log(data.message);
+            // Display a success message or perform any other action
+            document
+              .getElementById("success")
+              .classList.add("btn", "btn-success");
+            document.getElementById("success").innerHTML =
+              "message sent well to your patient";
+            // Optionally, hide the modal or reset the form
+            // reload after 2 sec
+            setTimeout(function () {
+              window.location.reload();
+            }, 2000);
+            // Hide the modal
+            $("#sendMessageModal").modal("hide");
+          } else if (data.error) {
+            console.error(data.error);
+          }
+        })
+        .catch((error) => console.error("Error:", error));
+    });
+
+
+
+// progress bar
+document.getElementById('update-progress-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const progress = document.getElementById('progress-input').value;
+  
+  fetch('/update_patient_progress', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      patient_id: {{ patient.patient_id }},
+      progress: progress
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    document.getElementById('success').classList.add ("btn", "btn-success");
+   document.getElementById('success').innerHTML="Progress updated successfully"
+    updateProgressBar(progress);
+  });
+});
+
+function updateProgressBar(progress) {
+  const progressBar = document.getElementById('progress-bar');
+  progressBar.style.width = `${progress}%`;
+  progressBar.setAttribute('aria-valuenow', progress);
+  progressBar.textContent = `${progress}%`;
+}
+</script>
+{% endblock %} {% block scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Bootstrap JS (Optional for Bootstrap functionalities) -->
+<script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.0.2/dist/chart.min.js"></script>
+<script src="{{ url_for('static', filename='js/jquery-3.5.1.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery.dataTables.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dataTables.bootstrap5.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+{% endblock %}

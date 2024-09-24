@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+{% extends "patient/base.html" %} {% block title %}Patient Dashboard{% endblock
+%} {% block body %} {% include "patient/navbar.html" %}
+
+<main class="mt-5 pt-3">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <h4>Patient portal</h4>
+        <label for="success0message" id="success"></label>
+      </div>
+    </div>
+    <div class="row">
+      <!-- therapist detail -->
+      <div class="col-md-4 mb-2">
+        <div class="card bg-light text-black h-70">
+          <div
+            class="card-header d-flex justify-content-between align-items-center"
+          >
+            <h5 class="mb-0">
+              <i class="bi bi-person-badge me-2"></i>My Therapist
+            </h5>
+
+            <!-- Button to send message -->
+           
+          </div>
+
+          <div class="card-body">
+            <h6 class="card-title">{{doctor.fullname}}</h6>
+            <p class="card-text">
+              <i class="bi bi-envelope me-2"></i>{{doctor.email}}
+            </p>
+            <p class="card-text">
+              <i class="bi bi-telephone me-2"></i>{{doctor.contact}}
+            </p>
+            <p class="card-text">
+              <i class="bi bi-gender-ambiguous me-2"></i>{{doctor.gender}}
+            </p>
+            <p class="card-text">
+              <i class="bi bi-briefcase me-2"></i>{{position.position_name}}
+            </p>
+          </div>
+        </div>
+      </div>
+      <!-- message block -->
+      <div class="col-md-8 mb-4">
+        <div class="card">
+          <!-- Add this to the patient dashboard -->
+<div class="row">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h5>Log Your Progress</h5>
+        <label for="success0message" id="success"></label>
+      </div>
+      <div class="card-body">
+        <form id="progress-form">
+          <div class="form-group">
+            <label for="mood">Mood (1-10)</label>
+            <input type="number" class="form-control" id="mood" min="1" max="10" required>
+            <small class="form-text text-muted">
+              1: Very difficult | 2: Struggling significantly | 3: Difficult | 4: Less difficult | 
+              5: Neutral | 6: Slightly better than average | 7: Good | 8: Very good | 
+              9: Excellent | 10: Outstanding
+            </small>
+          </div>
+          <div class="form-group">
+            <label for="symptoms">Symptoms</label>
+            <input type="text" class="form-control" id="symptoms">
+          </div>
+          <div class="form-group">
+            <label for="notes">Notes</label>
+            <textarea class="form-control" id="notes"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Log Progress</button>
+        </form>
+      </div>
+      
+      
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h5>Progress Graph</h5>
+      </div>
+      <div class="card-body">
+        <canvas id="progressChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+
+    <div class="card">
+      <div class="card-header">
+        <h4>
+          <i class="bi bi-clipboard-pulse me-2"></i> My Mental Health Status
+        </h4>
+      </div>
+      <!-- <div class="card-body">
+        {% if questionnaire %}
+        <div class="questionnaire">
+          <h5 class="mb-3">
+            Questionnaire submitted on {{
+            questionnaire.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+          </h5>
+          <table class="table table-striped">
+            <tbody>
+              <tr>
+                <td>Have You Ever Felt Suicidal</td>
+                <td>
+                  <span
+                    class="badge {% if questionnaire.qn1 == '1' %}bg-danger{% else %}bg-success{% endif %}"
+                    >{{ 'Yes' if questionnaire.qn1 == '1' else 'No' }}</span
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>Have You Lost interest in things you used to like</td>
+                <td>
+                  <span
+                    class="badge {% if questionnaire.qn2 == '1' %}bg-danger{% else %}bg-success{% endif %}"
+                    >{{ 'Yes' if questionnaire.qn2 == '1' else 'No' }}</span
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>Have You Ever felt hopeless about your future</td>
+                <td>
+                  <span
+                    class="badge {% if questionnaire.qn3 == '1' %}bg-danger{% else %}bg-success{% endif %}"
+                    >{{ 'Yes' if questionnaire.qn3 == '1' else 'No' }}</span
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>Have You Ever found it difficult to make decisions</td>
+                <td>
+                  <span
+                    class="badge {% if questionnaire.qn4 == '1' %}bg-danger{% else %}bg-success{% endif %}"
+                    >{{ 'Yes' if questionnaire.qn4 == '1' else 'No' }}</span
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>Have You Ever taken drugs</td>
+                <td>
+                  <span
+                    class="badge {% if questionnaire.qn5 == '1' %}bg-danger{% else %}bg-success{% endif %}"
+                    >{{ 'Yes' if questionnaire.qn5 == '1' else 'No' }}</span
+                  >
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="text-muted">You haven't submitted any questionnaires yet.</p>
+        {% endif %}
+      </div> -->
+    </div>
+  </div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.getElementById('progress-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const data = {
+        patient_id: {{ patient.patient_id }},
+        mood: document.getElementById('mood').value,
+        symptoms: document.getElementById('symptoms').value,
+        notes: document.getElementById('notes').value
+    };
+    fetch('/log_progress', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('success').classList.add("btn", "btn-success")
+      document.getElementById('success').innerHTML="Progress logged successfully"; 
+      fetchProgressData();
+     //reload after 2sec
+     setTimeout(function () {
+                window.location.reload();
+              }, 2000);
+    });
+});
+
+function fetchProgressData() {
+    fetch('/get_progress/{{ patient.patient_id }}')
+    .then(response => response.json())
+    .then(data => {
+        const labels = data.map(log => new Date(log.timestamp).toLocaleDateString());
+        const moodData = data.map(log => log.mood);
+        
+        const ctx = document.getElementById('progressChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Mood',
+                    data: moodData,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 10
+                    }
+                }
+            }
+        });
+    });
+}
+
+fetchProgressData();
+</script>
+</script>
+<script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.0.2/dist/chart.min.js"></script>
+<script src="{{ url_for('static', filename='js/jquery-3.5.1.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery.dataTables.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dataTables.bootstrap5.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+{% endblock %}
