@@ -4,6 +4,10 @@ from app.models import Patient, Doctor, UserLog, Admin, Position, Questionnaire,
 from datetime import datetime, date
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 import logging
+import uuid
+import requests
+from requests.exceptions import RequestException
+from app.auth import access_token, key, target_environment
 
 
 @app.route('/')
@@ -774,3 +778,93 @@ def get_progress(patient_id):
     } for log in logs]), 200
 
 
+
+# request to pay route 
+@app.route('/request_payment', methods=['POST'])
+def request_payment():
+    
+    number = "0786729283"
+    # number = "0796060594"
+
+    amount = 300
+    amount = int(amount)
+
+                # Generate a version 4 (random) UUID
+    reference_id = str(uuid.uuid4())
+
+    authorization = f'Bearer {access_token}'
+
+    # Store authorization and reference_id in session
+    session['authorization'] = authorization
+    session['reference_id'] = reference_id
+
+    unique_id = str(uuid.uuid4().int)[:5]  # Generate a 5-digit unique ID
+
+    request_body = {
+        "amount": amount,
+        "currency": "RWF",
+        "externalId": unique_id,
+        "payer": {
+            "partyIdType": "MSISDN",
+            "partyId": "25"+ number,
+            },
+        "payerMessage": "Payment for ticket",
+        "payeeNote": f"Invoice {unique_id}",
+        }
+
+    headers = {
+        'Authorization': authorization,
+        # 'X-Callback-Url': 'http://localhost/clemant/update.php',
+        'X-Reference-Id': reference_id,
+        'X-Target-Environment': target_environment,
+        'Content-Type': 'application/json',
+        'Ocp-Apim-Subscription-Key': key,
+        }
+    url = 'https://mtndeveloperapi.portal.mtn.co.rw/collection/v1_0/requesttopay'
+    try:
+        response = requests.post(url, headers=headers, json=request_body, verify=False)
+        response.raise_for_status()
+
+     
+        if response:
+            status = int(response.status_code)
+            if status == 202 :
+                # return redirect(url_for('payment_status'))
+                return "payment initialized well"
+            else:
+                return "The response failed."
+        else:
+            return "The response is empty."
+
+    except RequestException as ex:
+        return str(ex)
+    return access_token
+@app.route('/payment_status', methods=['GET'])
+def payment_status():
+    authorization = session.get('authorization')
+    reference_id = session.get('reference_id')
+    headers = {
+        'Authorization': authorization,
+        'X-Reference-Id': reference_id,
+        'X-Target-Environment': target_environment,
+        'Content-Type': 'application/json',
+        'Ocp-Apim-Subscription-Key': key,
+        }
+
+    url = 'https://mtndeveloperapi.portal.mtn.co.rw/collection/v1_0/requesttopay/'+reference_id
+    try:
+        response = requests.get(url, headers=headers, verify=False)
+        response.raise_for_status()
+        if response:
+            status = int(response.status_code)
+            if status == 200 :
+                # return redirect(url_for('payment_status'))
+                return response.text
+                # return "payment successful"
+            else:
+                return "The response failed."
+        else:
+            return "The response is empty."
+    except RequestException as ex:
+        return str(ex)
+    return access_token
