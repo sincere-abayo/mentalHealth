@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, url_for, flash, session, jsonify
 from app import app, db
-from app.models import Patient, Doctor, UserLog, Admin, Position, Questionnaire, DoctorPatientAssignment, Message, ProgressLog
+from app.models import Patient, Doctor, Admin, Position, Questionnaire, DoctorPatientAssignment, Message, ProgressLog
 from datetime import datetime, date
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 import logging
@@ -8,23 +8,36 @@ import uuid
 import requests
 from requests.exceptions import RequestException
 from app.auth import access_token, key, target_environment
+import os
+from werkzeug.utils import secure_filename
 
+
+
+from app.models import Doctor, Position
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    doctors = Doctor.query.join(Position).all()
+    doctor_data = []
+    for doctor in doctors:
+        doctor_info = {
+            'fullname': doctor.fullname,
+            'email': doctor.email,
+            'gender': doctor.gender,
+            'contact': doctor.contact,
+            'profile': doctor.profile,
+            'position': doctor.position.position_name if doctor.position else 'Unassigned'
+        }
+        doctor_data.append(doctor_info)
+    return render_template('index.html', doctors=doctor_data)
 
 @app.route('/questions')
-
-
 def questions():
     if 'patient_id' not in session:
         flash('Please log in to access the questionnaire.', 'register')
         return redirect(url_for('index'))
     return render_template('questions.html')
 
-def questions():
-    return render_template('questions.html')
 
 # register new patint
 @app.route('/register', methods=['GET', 'POST'])
@@ -255,12 +268,7 @@ def doctorlogin():
             session['doctor_id'] = doctor.doctor_id
             session['name'] = doctor.fullname
             session['email'] = doctor.email
-            
-            # Create a new UserLog entry
-            new_log = UserLog(user_id=doctor.doctor_id, loginTime=datetime.utcnow())
-            db.session.add(new_log)
-            db.session.commit()
-            
+                        
             return redirect(url_for('doctor_dashboard'))
         else:
             flash('Invalid email or password', 'doctor_login_error')
@@ -409,14 +417,15 @@ def patient_dashboard():
         return redirect('/')
    
     patient = Patient.query.get(session['patient_id'])
+    
+    if patient.status == "pending" : 
+        flash('Your registration is pending. Please wait for confirmation.', 'patient_pending')
+        return redirect('/patient_pending')
     position = Position.query.filter_by(position_id=patient.position_id).first()
     questionnaire = Questionnaire.query.filter_by(patient_id=patient.patient_id).order_by(Questionnaire.created_at.desc()).first()
     assigned_doctor_id = DoctorPatientAssignment.query.filter_by(patient_id=patient.patient_id).first()
     doctor = Doctor.query.get(assigned_doctor_id.doctor_id)
 
-    if patient.status == "pending" : 
-        flash('Your registration is pending. Please wait for confirmation.', 'patient_pending')
-        return redirect('/patient_pending')
         
     return render_template('patient/patient_dashboard.html',position=position, doctor=doctor, patient=patient, questionnaire=questionnaire)
 
@@ -489,8 +498,6 @@ def admin_dashboard():
                            confirmed_patient_count=confirmed_patient_count,
                            patients_count=patients_count,
                            patients=patients,inactive_patient_count=inactive_patient_count)
-
-
 
 @app.route('/patients')
 def patients():
@@ -575,7 +582,7 @@ from app.models import Doctor, Position
 @app.route('/add_doctor', methods=['GET', 'POST'])
 def add_doctor():
     positions = Position.query.all()
-    
+
     if request.method == 'POST':
         fullname = request.form.get('doctor_name')
         position_id = request.form.get('doctor_position')
@@ -590,12 +597,21 @@ def add_doctor():
             flash('Email already exists', 'error')
             return redirect(url_for('add_doctor'))
 
+        filename = None
+        # Handle profile image upload
+        if 'doctor_profile' in request.files:
+            profile = request.files['doctor_profile']
+            if profile.filename != '':
+                filename = secure_filename(profile.filename)
+                profile.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
         new_doctor = Doctor(
             fullname=fullname,
             position_id=position_id,
             email=email,
             gender=gender,
             contact=contact,
+            profile=filename,
             password=password  # Storing password as plain text
         )
 
@@ -661,16 +677,6 @@ def logout():
     user_id = session.get('admin_id') or session.get('doctor_id')
     user_type = 'admin' if 'admin_id' in session else 'doctor'
 
-    if user_id:
-        # Update the UserLog entry with logout time
-        latest_log = UserLog.query.filter_by(user_id=user_id, logoutTime=None).order_by(UserLog.loginTime.desc()).first()
-        if latest_log:
-            latest_log.logoutTime = datetime.utcnow()
-            db.session.commit()
-        
-        # Clear the session
-        session.clear()
-    
     # Redirect based on user type
     if user_type == 'admin':
         return redirect(url_for('adminlogin'))
@@ -777,7 +783,21 @@ def get_progress(patient_id):
         "timestamp": log.timestamp.isoformat()
     } for log in logs]), 200
 
-
+@app.route('/api/doctors', methods=['GET'])
+def get_doctors():
+    doctors = Doctor.query.all()
+    doctor_list = []
+    for doctor in doctors:
+        doctor_data = {
+            'id': doctor.doctor_id,
+            'fullname': doctor.fullname,
+            'email': doctor.email,
+            'gender': doctor.gender,
+            'contact': doctor.contact,
+            'position': doctor.position.name if doctor.position else None
+        }
+        doctor_list.append(doctor_data)
+    return jsonify(doctors=doctor_list)
 
 # request to pay route 
 @app.route('/request_payment', methods=['POST'])
@@ -814,7 +834,6 @@ def request_payment():
 
     headers = {
         'Authorization': authorization,
-        # 'X-Callback-Url': 'http://localhost/clemant/update.php',
         'X-Reference-Id': reference_id,
         'X-Target-Environment': target_environment,
         'Content-Type': 'application/json',

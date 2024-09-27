@@ -2,16 +2,16 @@ from app import db
 from datetime import datetime
 
 # Log model for user login and logout tracking
-class UserLog(db.Model):
-    __tablename__ = 'user_log'
-    log_id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('doctor.doctor_id'), nullable=False)
-    loginTime = db.Column(db.DateTime, nullable=False)
-    logoutTime = db.Column(db.DateTime)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+# class UserLog(db.Model):
+#     __tablename__ = 'user_log'
+#     log_id = db.Column(db.Integer, primary_key=True)
+#     user_id = db.Column(db.Integer, db.ForeignKey('doctor.doctor_id'), nullable=False)
+#     loginTime = db.Column(db.DateTime, nullable=False)
+#     logoutTime = db.Column(db.DateTime)
+#     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+#     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    doctor = db.relationship('Doctor', back_populates='logs')
+#     doctor = db.relationship('Doctor', back_populates='logs')
 
 # Doctor model
 class Doctor(db.Model):
@@ -22,13 +22,14 @@ class Doctor(db.Model):
     email = db.Column(db.String(100), unique=True, nullable=False)
     gender = db.Column(db.Enum('Male', 'Female', 'Other'), nullable=False)
     contact = db.Column(db.String(20))
+    profile = db.Column(db.String(100))
     password = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationships
     position = db.relationship('Position', back_populates='doctors')
-    logs = db.relationship('UserLog', back_populates='doctor')
+    # logs = db.relationship('UserLog', back_populates='doctor')
     patient_assignments = db.relationship('DoctorPatientAssignment', back_populates='doctor')
 
 # Admin model

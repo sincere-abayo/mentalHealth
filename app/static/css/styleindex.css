@@ -257,12 +257,28 @@ section:nth-child(even){
     line-height: 1.8;
 }
 
-.doctors .box-container{
+
+.doctors .box-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(30rem, 1fr));
-    gap:2rem;
+    gap: 2rem;
+    max-width: 100%;
+    margin: 0 auto;
 }
 
+@media (min-width: 768px) {
+    .doctors .box-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 767px) {
+    .doctors .box-container {
+        grid-template-columns: 1fr;
+        max-width: 30rem;
+    }
+}
+ 
 .doctors .box-container .box{
     text-align: center;
     background:#fff;

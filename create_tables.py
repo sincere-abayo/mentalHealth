@@ -1,5 +1,5 @@
 from app import app, db
-from app.models import Patient, Doctor, Admin, Position, UserLog  # Import all your models
+from app.models import Patient, Doctor, Admin, Position  # Import all your models
 from datetime import datetime
 # from werkzeug.security import generate_password_hash  # To hash passwords securely
 

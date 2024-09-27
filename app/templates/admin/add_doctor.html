@@ -16,10 +16,29 @@
       <div class="col-md-12 mb-3">
         <div class="card">
           <div class="card-header">
-            <span><i class="bi bi-person-badge-fill me-2"></i>DOCTOR DETAILS</span> 
+                      <span><i class="bi bi-person-badge-fill me-2"></i>DOCTOR DETAILS</span> 
+
+                      {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                          {% for category, message in messages %}
+                            {% if category == 'error' %}
+                              <div class="alert alert-danger" role="alert">
+                                {{ message }}
+                              </div>
+                            {% endif %}
+                          {% endfor %}
+                        {% endif %}
+                      {% endwith %}
+         
           </div>
           <div class="card-body">
-            <form class="form-horizontal" action="{{ url_for('add_doctor') }}" method="POST">
+            <form class="form-horizontal" action="{{ url_for('add_doctor') }}" enctype="multipart/form-data" method="POST">
+              <div class="form-group">
+                <label class="control-label col-lg-2 mb-2" for="doctor_profile">DOCTOR PROFILE</label>
+                <div class="col-lg-8">
+                  <input type="file" class="form-control mb-2" id="doctor_profile" name="doctor_profile" accept="image/*" required>
+                </div>
+              </div>
               <div class="form-group">
                 <label class="control-label col-lg-2 mb-2" for="doctor_name">DOCTOR NAME</label>
                 <div class="col-lg-8">
@@ -43,12 +62,14 @@
                   <input type="text" class="form-control mb-2" id="doctor_phone" name="doctor_phone" required>
                 </div>
               </div>
+
               <div class="form-group">
                 <label class="control-label col-lg-2 mb-2" for="doctor_email">DOCTOR EMAIL</label>
                 <div class="col-lg-8">
                   <input type="email" class="form-control mb-2" id="doctor_email" name="doctor_email" required>
                 </div>
               </div>
+
               <div class="form-group">
                 <label class="control-label col-lg-2 mb-2" for="doctor_pswd">DOCTOR PASSWORD</label>
                 <div class="col-lg-8">

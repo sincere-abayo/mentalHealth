@@ -5,3 +5,4 @@ PyMySQL==1.0.2
 PyBackground == 0.1.2
 requests == 2.32.3
 uuid == 1.30
+utils == 1.0.2
