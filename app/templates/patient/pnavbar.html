@@ -46,7 +46,52 @@
 </nav>
 
     <div class="offcanvas offcanvas-start sidebar-nav bg-dark" tabindex="-1" id="sidebar">
-     
+      <div class="offcanvas-body p-0">
+        <nav class="navbar-dark">
+          <ul class="navbar-nav">
+            <li>
+              
+            </li>
+           
+            <!--
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle px-3 active" href="#" id="patientsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="me-2"><i class="bi bi-people"></i></span>
+                <span>Patients</span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="patientsDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('confirmed_patients') }}">Confirmed Patients</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('pending_patients') }}">Pending Patients</a></li>
+              </ul>
+            </li>
+            <li class="my-4"><hr class="dropdown-divider bg-light" /></li>
+            <li>
+              <div class="text-muted small fw-bold text-uppercase px-3 mb-3">
+                Interface
+              </div>
+            </li>
+            <li>
+              <a href="{{ url_for('add_admin') }}" class="nav-link px-3">
+                <span class="me-2"><i class="bi bi-plus"></i></span>
+                <span>Add Admin</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('add_doctor') }}" class="nav-link px-3">
+                <span class="me-2"><i class="bi bi-plus"></i></span>
+                <span>Add Doctor</span>
+              </a> 
+            </li> -->
+            <li>
+              <a href="/patient-logout" class="nav-link px-3">
+                <span class="me-2"><i class="bi bi-plus"></i></span>
+                <span>LogOut</span>
+              </a>
+            </li>
+            <li class="my-4"><hr class="dropdown-divider bg-light" /></li>
+          </ul>
+        </nav>
+      </div>
     </div>
     
     
