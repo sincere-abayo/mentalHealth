@@ -12,6 +12,8 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
     />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
     <style>
       .dropdown {
         float: right;
@@ -56,6 +58,29 @@
       .dropdown:hover .dropdown-content {
         display: block;
       }
+      #togglePassword {
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  .password-container {
+  position: relative;
+}
+
+.password-container input {
+  padding-right: 40px;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
     </style>
     <!-- custom css file link  -->
     <link
@@ -314,13 +339,30 @@
             name="email"
             required
           />
-          <input
-            type="password"
-            placeholder="Your password"
-            class="box"
-            name="password"
-            required
-          />
+
+          <div class="form-row">
+            <div class="col-lg-8">
+              <div class="password-container">
+                <input
+                  type="password"
+                  placeholder="Your password"
+                  class="box"
+                  name="password"
+                  id="password"
+                  required
+                />
+                <button type="button" id="togglePassword" class="password-toggle">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          
+          
+          
+
+
           <select class="box" required name="gender">
             <option value="">-- Choose Gender--</option>
             <option value="Female">Female</option>
@@ -477,3 +519,15 @@
 
       <div class="credit">
         created by <span>Niyomushumba Josiane</span> | all rights reserved
+        <script>
+          const togglePassword = document.querySelector('#togglePassword');
+          const password = document.querySelector('#password');
+        
+          togglePassword.addEventListener('click', function (e) {
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            this.querySelector('i').classList.toggle('fa-eye');
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+          });
+        </script>
+        
