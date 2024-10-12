@@ -22,4 +22,10 @@ if not app.debug:
     app.logger.setLevel(logging.INFO)
     app.logger.info('Mental Health startup')
 
+def clear_logs():
+    log_file = 'logs/mental_health.log'
+    if os.path.exists(log_file):
+        open(log_file, 'w').close()
+    app.logger.info('Logs cleared')
+
 from app import routes, models
