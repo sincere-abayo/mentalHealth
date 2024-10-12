@@ -279,6 +279,7 @@ def confirm_payment():
     
     if patient:
        patient.status = "pending"
+       db.session.commit()
        subject = "MHPC MS -Patient Payment Confirmation"
        email = patient.email
 
