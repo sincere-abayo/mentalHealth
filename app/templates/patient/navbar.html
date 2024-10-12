@@ -37,7 +37,7 @@
             <i class="bi bi-person-fill"></i>
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="/logout">LogOut</a></li>
+            <li><a class="dropdown-item" href="/patient-logout">LogOut</a></li>
           </ul>
         </li>
       </ul>
@@ -55,14 +55,14 @@
               </div>
             </li>
             <li>
-              <a href="{{ url_for('patient_dashboard') }}" class="nav-link px-3 active">
+              <a target="_blank" href="{{ url_for('patient_dashboard') }}" class="nav-link px-3 active">
                 <span class="me-2" aria-label="Toggle navigation"><i class="bi bi-speedometer2"></i></span>
                 <span>Dashboard</span>
           
               </a>
             </li>
            <li>
-              <a href="{{ url_for('patient_progress_report') }}" class="nav-link px-3 active">
+              <a target="_blank" href="{{ url_for('patient_progress_report') }}" class="nav-link px-3 active">
                 <span class="me-2"><i class="bi bi-person-badge-fill"></i></span>
                 <span>Progress</span>
               </a>
@@ -94,10 +94,10 @@
               <a href="{{ url_for('add_doctor') }}" class="nav-link px-3">
                 <span class="me-2"><i class="bi bi-plus"></i></span>
                 <span>Add Doctor</span>
-              </a>
+              </a> 
             </li> -->
             <li>
-              <a href="/logout" class="nav-link px-3">
+              <a href="/patient-logout" class="nav-link px-3">
                 <span class="me-2"><i class="bi bi-plus"></i></span>
                 <span>LogOut</span>
               </a>

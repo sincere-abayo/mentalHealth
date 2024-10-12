@@ -10,14 +10,14 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 api_user_id = '58a75be0-35cf-4140-bdce-fabce66976e6'
 api_key = 'f0116eeaa3734d42b29a939d7e420643'
 target_environment = "mtnrwanda"
-key = "ad2c48fddd8f42ddbf5b917ae23ca431"
+key = "3b7f23556ab24875bb12089f6db56926"
 access_token = "no token found"
 
 credentials = f"{api_user_id}:{api_key}"
 encoded_credentials = base64.b64encode(credentials.encode()).decode()
 encoded_credentials = f'Basic {encoded_credentials}'
-
-url = 'https://mtndeveloperapi.portal.mtn.co.rw/collection/token/'
+print (encoded_credentials)
+url = 'https://sandbox.momodeveloper.mtn.com/collection/token/'
 
 headers = {
     'Authorization': encoded_credentials,
@@ -35,7 +35,7 @@ try:
     if 'access_token' in response_body:
         access_token = response_body['access_token']
         
-        # print(access_token)
+        print(access_token)
     else:
         access_token = "no token found"
 

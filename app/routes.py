@@ -142,6 +142,7 @@ def submit_questionnaire():
             patient = Patient.query.filter_by(patient_id=session.get('patient_id')).first()
             if patient:
                 patient.position_id = position.position_id
+                patient.status = "pending"
                                 
                 # Create and insert new Questionnaire entry
                 new_questionnaire = Questionnaire(
@@ -157,7 +158,8 @@ def submit_questionnaire():
 
                 db.session.commit()
                 flash(f'{position_name}.', 'successfull',)
-                return render_template('success.html')
+                # return render_template('success.html')
+                return redirect('/patient_pending')
             else:
                 flash('Patient record not found. Please try again.', 'error')
                 # insert into questionaire 
@@ -417,6 +419,10 @@ def patient_dashboard():
         return redirect('/')
    
     patient = Patient.query.get(session['patient_id'])
+    
+    if patient.status == "inactive" : 
+        flash('Your registration is pending. Please wait for confirmation.', 'patient_pending')
+        return redirect(url_for('questions'))
     
     if patient.status == "pending" : 
         flash('Your registration is pending. Please wait for confirmation.', 'patient_pending')
@@ -807,7 +813,7 @@ def request_payment():
     # number = "0796060594"
 
     amount = 300
-    amount = int(amount)
+    amount = int(amount)  
 
                 # Generate a version 4 (random) UUID
     reference_id = str(uuid.uuid4())
@@ -840,6 +846,7 @@ def request_payment():
         'Ocp-Apim-Subscription-Key': key,
         }
     url = 'https://mtndeveloperapi.portal.mtn.co.rw/collection/v1_0/requesttopay'
+    # url = 'https://mtndeveloperapi.portal.mtn.co.rw/collection/v1_0/requesttopay'
     try:
         response = requests.post(url, headers=headers, json=request_body, verify=False)
         response.raise_for_status()

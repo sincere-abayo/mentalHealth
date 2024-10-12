@@ -37,16 +37,16 @@ with app.app_context():
     )
     db.session.add(admin)
 
-    # Sample Doctor User
-    doctor = Doctor(
-        fullname='Dr. John Doctor',
-        email='doctor@gmail.com',
-        gender='Male',
-        contact='1234567890',
-        password='123',
-        position=therapist_case_manager  # Link doctor to the "Therapist Case Manager" position
-    )
-    db.session.add(doctor)
+    # # Sample Doctor User
+    # doctor = Doctor(
+    #     fullname='Dr. John Doctor',
+    #     email='doctor@gmail.com',
+    #     gender='Male',
+    #     contact='1234567890',
+    #     password='123',
+    #     position=therapist_case_manager  # Link doctor to the "Therapist Case Manager" position
+    # )
+    # db.session.add(doctor)
 
     # Commit all changes
     db.session.commit()
