@@ -55,14 +55,14 @@
               </div>
             </li>
             <li>
-              <a href="{{ url_for('admin_dashboard') }}" class="nav-link px-3 active">
+              <a target="_blank" href="{{ url_for('admin_dashboard') }}" class="nav-link px-3 active">
                 <span class="me-2" aria-label="Toggle navigation"><i class="bi bi-speedometer2"></i></span>
                 <span>Dashboard</span>
           
               </a>
             </li>
             <li>
-              <a href="{{ url_for('doctors') }}" class="nav-link px-3 active">
+              <a target="_blank" href="{{ url_for('doctors') }}" class="nav-link px-3 active">
                 <span class="me-2"><i class="bi bi-person-badge-fill"></i></span>
                 <span>Doctors</span>
               </a>
@@ -73,9 +73,9 @@
                 <span>Patients</span>
               </a>
               <ul class="dropdown-menu" aria-labelledby="patientsDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('inactive_patients') }}">Inactive Patients</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('pending_patients') }}">Pending Patients</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('taken_patients') }}">Taken Patients</a></li>
+                <li><a target="_blank" class="dropdown-item" href="{{ url_for('inactive_patients') }}">Inactive Patients</a></li>
+                <li><a target="_blank" class="dropdown-item" href="{{ url_for('pending_patients') }}">Pending Patients</a></li>
+                <li><a target="_blank" class="dropdown-item" href="{{ url_for('taken_patients') }}">Taken Patients</a></li>
               </ul>
             </li>
             <li class="my-4"><hr class="dropdown-divider bg-light" /></li>
@@ -85,13 +85,13 @@
               </div>
             </li>
             <li>
-              <a href="{{ url_for('add_admin') }}" class="nav-link px-3">
+              <a target="_blank" href="{{ url_for('add_admin') }}" class="nav-link px-3">
                 <span class="me-2"><i class="bi bi-plus"></i></span>
                 <span>Add Admin</span>
               </a>
             </li>
             <li>
-              <a href="{{ url_for('add_doctor') }}" class="nav-link px-3">
+              <a target="_blank" href="{{ url_for('add_doctor') }}" class="nav-link px-3">
                 <span class="me-2"><i class="bi bi-plus"></i></span>
                 <span>Add Doctor</span>
               </a>
