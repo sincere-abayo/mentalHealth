@@ -5,6 +5,20 @@
 {% block body %}
 {% include "admin/navbar.html" %}
 
+<style>
+   .password-container {
+        position: relative;
+      }
+
+      .password-container .fa-eye {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        cursor: pointer;
+      }
+</style>
+
 <main class="mt-5 pt-3">
   <div class="container-fluid">
     <div class="row">
@@ -72,7 +86,7 @@
 
               <div class="form-group">
                 <label class="control-label col-lg-2 mb-2" for="doctor_pswd">DOCTOR PASSWORD</label>
-                <div class="col-lg-8">
+                <div class="col-lg-8 password-container">
                   <input type="password" class="form-control mb-2" id="doctor_pswd" name="doctor_pswd" required>
                 </div>
               </div>
@@ -109,4 +123,21 @@
 <script src="{{ url_for('static', filename='js/jquery.dataTables.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/dataTables.bootstrap5.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+
+
+<script>
+  const togglePassword = document.querySelector('#togglePassword');
+  const password = document.querySelector('#password');
+
+  togglePassword.addEventListener('click', function (e) {
+    // toggle the type attribute
+    const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+    password.setAttribute('type', type);
+    // toggle the eye slash icon
+    this.classList.toggle('fa-eye-slash');
+  });
+</script>
+
+
 {% endblock %}

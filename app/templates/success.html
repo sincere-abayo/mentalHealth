@@ -56,58 +56,12 @@
       <div class="alert alert-{{ category }}"> Information successfully recorded. After payment you will be contacted soon by our Therapist doctor in
         <br>  <b>{{ message }}</b></div>
       {% endif %} {% endfor %} {% endif %} {% endwith %}
-      <form
-        action="https://afripay.africa/checkout/index.php"
-        method="post"
-        id="afripayform"
-      >
-        <input type="hidden" name="amount" value="500" />
-
-        <input type="hidden" name="currency" value="RWF" />
-
-        <input type="hidden" name="comment" value="Order 122" />
-
-        <input type="hidden" name="client_token" value="" />
-
-        <input
-          type="hidden"
-          name="return_url"
-          value="http://127.0.0.1:5000/payment_pending"
-        />
-
-        <input type="hidden" name="firstname" value="" />
-
-        <input type="hidden" name="lastname" value="" />
-
-        <input type="hidden" name="street" value="" />
-
-        <input type="hidden" name="city" value="" />
-
-        <input type="hidden" name="state" value="" />
-
-        <input type="hidden" name="zip_code" value="" />
-
-        <input type="hidden" name="country" value="" />
-
-        <input type="hidden" name="email" value="" />
-
-        <input type="hidden" name="phone" value="" />
-
-        <input
-          type="hidden"
-          name="app_id"
-          value="143b342a2c1359ce58579e53c51cee5c"
-        />
-
-        <input type="hidden" name="app_secret" value="JDJ5JDEwJEVDenJO" />
-
-        <input
-          type="submit"
-          name="submit"
-          value="Pay with AfriPay"
-          onclick="document.afripayform.submit();"
-          class="btn"
-        />
+      <div class="alert">
+      payment amount is 500 Rwf
+      </div>
+      <form>
+      
+       <a href="/confirm_payment" class="btn"> coonfirm Payment</a>
       </form>
       
   </body>

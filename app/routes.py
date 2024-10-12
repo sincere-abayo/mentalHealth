@@ -7,9 +7,12 @@ import logging
 import uuid
 import requests
 from requests.exceptions import RequestException
-from app.auth import access_token, key, target_environment
+# from app.auth import access_token, key, target_environment
 import os
 from werkzeug.utils import secure_filename
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 
 
@@ -86,7 +89,42 @@ def register():
               # Store the patient_id in the session
             session['patient_id'] = new_patient.patient_id
             session['patient_email'] = new_patient.email
-
+            subject = "MHPC MS - Patient Registration successfuly"
+            body = """
+    <html>
+    <head>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                color: #333;
+            }
+            .container {
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #f4f4f4;
+            }
+            h1 {
+                color: #0066cc;
+            }
+            p {
+                margin-bottom: 15px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Registration Successful</h1>
+            <p>This is a confirmation email for your recent registration with the MentalHealth Mental Health Problem Checkup Management System
+.</p>
+        
+        </div>
+    </body>
+    </html>
+    """
+            to_email = email
+            send_email(subject, body, to_email)
             flash('Registration successful! Please continue with the questions.', 'reg_success')
             return redirect(url_for('questions'))   #Redirect to the steps page
 
@@ -142,7 +180,7 @@ def submit_questionnaire():
             patient = Patient.query.filter_by(patient_id=session.get('patient_id')).first()
             if patient:
                 patient.position_id = position.position_id
-                patient.status = "pending"
+                patient.status = "inactive"
                                 
                 # Create and insert new Questionnaire entry
                 new_questionnaire = Questionnaire(
@@ -159,7 +197,8 @@ def submit_questionnaire():
                 db.session.commit()
                 flash(f'{position_name}.', 'successfull',)
                 # return render_template('success.html')
-                return redirect('/patient_pending')
+                # return redirect('/patient_pending')
+                return redirect('/payment')
             else:
                 flash('Patient record not found. Please try again.', 'error')
                 # insert into questionaire 
@@ -227,6 +266,69 @@ def payment_success():
         flash('Please log in to access the questionnaire.', 'register')
         return redirect('/')
     return render_template('payment_pending.html')
+
+
+# confirm fake payment
+@app.route('/confirm_payment')
+def confirm_payment():
+    if 'patient_id' not in session:
+        flash('Please log in to access the questionnaire.', 'register')
+        return redirect('/')
+    
+    patient = Patient.query.filter_by(patient_id=session.get('patient_id')).first()
+    
+    if patient:
+       patient.status = "pending"
+       subject = "MHPC MS -Patient Payment Confirmation"
+       email = patient.email
+
+       body = """
+    <html>
+    <head>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                color: #333;
+            }
+            .container {
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #f4f4f4;
+            }
+            h1 {
+                color: #0066cc;
+            }
+            p {
+                margin-bottom: 15px;
+                font-size: 18px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Patient Payment Confirmation</h1>
+            <p>Thank u for your payment to Mental Health Problem Checkup Management System
+.<p>
+You are currently on the waiting list for one of our therapist.
+</p><p>
+Your appointment has been automatically assigned based on the answers you provided in the questionnaire.
+</p><p>
+We will notify you as soon as a therapist is available to treat you. Thank you for your patience.
+       
+    </p>
+        </div>
+    </body>
+    </html>
+    """
+         
+    to_email = email    
+    send_email(subject, body, to_email)
+    return redirect('/patient_pending')
+
+
+
 
 @app.route('/payment_failure')
 def payment_failure():
@@ -349,7 +451,17 @@ def take_patient(patient_id):
         return redirect(url_for('doctorlogin'))
     
     patient = Patient.query.get_or_404(patient_id)
+    # get patient email
+    patient_email= patient.email
     doctor_id = session['doctor_id']
+    # get doctor name
+    doctor = Doctor.query.get(doctor_id)
+    doctor_name = doctor.fullname
+    doctor_contact = doctor.contact
+
+    # get position of doctor
+    position = Position.query.filter_by(position_id=patient.position_id).first()
+    position_name = position.position_name
 
     # Create a new DoctorPatientAssignment
     assignment = DoctorPatientAssignment(
@@ -362,7 +474,48 @@ def take_patient(patient_id):
 
     # Update patient status
     patient.status = 'taken'
+    
     db.session.commit()
+    # Send email to patient about the appointment
+    subject = " MHPC MS - Therapist found for you"
+    body = """
+    <html>
+    <head>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                color: #333;
+            }
+            .container {
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #f4f4f4;
+            }
+            h1 {
+                color: #0066cc;
+            }
+            p {
+                margin-bottom: 15px;
+                font-size: 18px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Therapist Found for You</h1>
+            <p>Congratulations! We have assigned a therapist to support your mental health journey.</p>
+            <p>Your therapist's name: {doctor_name}</p>
+            <p>Therapist's contact: {doctor_contact}</p>
+            <p>Therapist's position: {position_name}</p>
+            <p>We're here to help you on your path to better mental health. Your therapist is looking forward to working with you.</p>
+        </div>
+    </body>
+    </html>
+    """
+    to_email = patient_email    
+    send_email(subject, body, to_email)
     flash('Patient taken successfully', 'taken')
     return redirect(url_for('doctor_taken_patients'))
 
@@ -569,6 +722,8 @@ def confirmed_patients():
 def pending_patients():
     pending_patients = Patient.query.filter_by(status='pending').order_by(Patient.patient_id.asc()).all()
     return render_template('admin/pending_patient.html', patients=pending_patients)
+
+
 
 @app.route('/inactive_patients')
 def inactive_patients():
@@ -894,3 +1049,28 @@ def payment_status():
     except RequestException as ex:
         return str(ex)
     return access_token
+
+
+# send email function
+
+def send_email(subject, body, to_email):
+    # Email configuration
+    smtp_server = "smtp.gmail.com"
+    smtp_port = 587
+    sender_email = "mhpcms2024@gmail.com"
+    sender_password = "qrpe sixl znov dxgj"
+
+    # Create the email message
+    message = MIMEMultipart()
+    message["From"] = sender_email
+    message["To"] = to_email
+    message["Subject"] = subject
+
+    # Add body to email as HTML
+    message.attach(MIMEText(body, "html"))
+
+    # Connect to the SMTP server and send the email
+    with smtplib.SMTP(smtp_server, smtp_port) as server:
+        server.starttls()
+        server.login(sender_email, sender_password)
+        server.send_message(message)
