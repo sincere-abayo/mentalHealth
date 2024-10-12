@@ -478,42 +478,44 @@ def take_patient(patient_id):
     db.session.commit()
     # Send email to patient about the appointment
     subject = " MHPC MS - Therapist found for you"
-    body = """
-    <html>
-    <head>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                line-height: 1.6;
-                color: #333;
-            }
-            .container {
-                max-width: 600px;
-                margin: 0 auto;
-                padding: 20px;
-                background-color: #f4f4f4;
-            }
-            h1 {
-                color: #0066cc;
-            }
-            p {
-                margin-bottom: 15px;
-                font-size: 18px;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <h1>Therapist Found for You</h1>
-            <p>Congratulations! We have assigned a therapist to support your mental health journey.</p>
-            <p>Your therapist's name: {doctor_name}</p>
-            <p>Therapist's contact: {doctor_contact}</p>
-            <p>Therapist's position: {position_name}</p>
-            <p>We're here to help you on your path to better mental health. Your therapist is looking forward to working with you.</p>
-        </div>
-    </body>
-    </html>
-    """
+    body = f"""
+<html>
+<head>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }}
+        .container {{
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }}
+        h1 {{
+            color: #0066cc;
+        }}
+        p {{
+            margin-bottom: 15px;
+            font-size: 18px;
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Therapist Found for You</h1>
+        <p>Congratulations! We have assigned a therapist to support your mental health journey.</p>
+        <p>Your therapist's name: {doctor_name}</p>
+        <p>Therapist's contact: {doctor_contact}</p>
+        <p>Therapist's position: {position_name}</p>
+        <p>We're here to help you on your path to better mental health. Your therapist is looking forward to working with you.</p>
+    </div>
+</body>
+</html>
+"""
+
+  
     to_email = patient_email    
     send_email(subject, body, to_email)
     flash('Patient taken successfully', 'taken')
