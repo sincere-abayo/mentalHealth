@@ -14,7 +14,7 @@ from datetime import datetime
 #     doctor = db.relationship('Doctor', back_populates='logs')
 
 # Doctor model
-class Doctor(db.Model):
+class Doctor(db.Model): 
     __tablename__ = 'doctor'
     doctor_id = db.Column(db.Integer, primary_key=True)
     position_id = db.Column(db.Integer, db.ForeignKey('position.position_id'), nullable=False)
